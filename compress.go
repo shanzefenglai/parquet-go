@@ -5,12 +5,12 @@ import (
 	"compress/gzip"
 	"errors"
 	"fmt"
+	"github.com/fraugster/parquet-go/parquet"
+	"github.com/golang/snappy"
+	"github.com/klauspost/compress/zstd"
 	"io"
 	"io/ioutil"
 	"sync"
-
-	"github.com/fraugster/parquet-go/parquet"
-	"github.com/golang/snappy"
 )
 
 var (
@@ -29,6 +29,7 @@ type (
 	plainCompressor  struct{}
 	snappyCompressor struct{}
 	gzipCompressor   struct{}
+	zstdCompressor   struct{}
 )
 
 func (plainCompressor) CompressBlock(block []byte) ([]byte, error) {
@@ -73,6 +74,34 @@ func (gzipCompressor) DecompressBlock(block []byte) ([]byte, error) {
 	}
 
 	return ret, r.Close()
+}
+
+func (zstdCompressor) CompressBlock(block []byte) ([]byte, error) {
+	var dst []byte
+	var encoder *zstd.Encoder
+	var err error
+	encoder, err = zstd.NewWriter(nil,
+		zstd.WithEncoderConcurrency(1),
+		zstd.WithZeroFrames(true),
+		zstd.WithEncoderCRC(false),
+	)
+	if err != nil {
+		return dst[:0], err
+	}
+	return encoder.EncodeAll(block, dst[:0]), nil
+}
+
+func (zstdCompressor) DecompressBlock(block []byte) ([]byte, error) {
+	var dst []byte
+	var decoder *zstd.Decoder
+	var err error
+	decoder, err = zstd.NewReader(nil,
+		zstd.WithDecoderConcurrency(1),
+	)
+	if err != nil {
+		return dst[:0], err
+	}
+	return decoder.DecodeAll(block, dst[:0])
 }
 
 func compressBlock(block []byte, method parquet.CompressionCodec) ([]byte, error) {
@@ -154,4 +183,5 @@ func init() {
 	RegisterBlockCompressor(parquet.CompressionCodec_UNCOMPRESSED, plainCompressor{})
 	RegisterBlockCompressor(parquet.CompressionCodec_GZIP, gzipCompressor{})
 	RegisterBlockCompressor(parquet.CompressionCodec_SNAPPY, snappyCompressor{})
+	RegisterBlockCompressor(parquet.CompressionCodec_ZSTD, zstdCompressor{})
 }

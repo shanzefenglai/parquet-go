@@ -1,15 +1,21 @@
-# github.com/apache/thrift v0.15.0
+# github.com/apache/thrift v0.16.0
 github.com/apache/thrift/lib/go/thrift
 # github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 github.com/araddon/dateparse
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/golang/snappy v0.0.1
+# github.com/golang/snappy v0.0.4
 github.com/golang/snappy
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
-# github.com/pkg/errors v0.9.1
-github.com/pkg/errors
+# github.com/klauspost/compress v1.17.5
+github.com/klauspost/compress
+github.com/klauspost/compress/fse
+github.com/klauspost/compress/huff0
+github.com/klauspost/compress/internal/cpuinfo
+github.com/klauspost/compress/internal/snapref
+github.com/klauspost/compress/zstd
+github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
 # github.com/spf13/cobra v0.0.5
